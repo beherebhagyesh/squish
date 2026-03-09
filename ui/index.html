@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Squish</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero">
+        <p class="eyebrow">Image Compression &amp; Conversion</p>
+        <h1>Squish</h1>
+        <p class="lede">
+          Pick a source folder, choose how you want your images processed, and convert. No terminal, no setup, no Python.
+        </p>
+      </section>
+
+      <!-- Step 1: Paths -->
+      <section class="panel controls">
+        <p class="step-label">Step 1 — Where</p>
+
+        <label for="sourcePath">Source folder</label>
+        <div class="path-row">
+          <input id="sourcePath" type="text" placeholder="Choose a folder or paste a path…" />
+          <button id="pickSourceBtn" class="pick-btn">Browse…</button>
+        </div>
+
+        <label for="outputBasePath">Output location</label>
+        <div class="path-row">
+          <input id="outputBasePath" type="text" placeholder="Choose where to save outputs…" />
+          <button id="pickOutputBtn" class="pick-btn">Browse…</button>
+        </div>
+
+        <label for="outputFolderName">Output folder name</label>
+        <div class="path-row single">
+          <input id="outputFolderName" type="text" placeholder="e.g. Compressed Images" />
+        </div>
+      </section>
+
+      <!-- Step 2: Mode -->
+      <section class="panel">
+        <p class="step-label">Step 2 — Mode</p>
+        <div class="mode-group" id="modeGroup">
+          <button class="mode-btn active" data-mode="keep_format">
+            <span class="mode-title">Keep Format &amp; Compress</span>
+            <span class="mode-desc">JPG stays JPG, PNG stays PNG — just smaller</span>
+          </button>
+          <button class="mode-btn" data-mode="to_webp_lossy">
+            <span class="mode-title">Convert to WebP</span>
+            <span class="mode-desc">Any format → WebP for web publishing</span>
+          </button>
+          <button class="mode-btn" data-mode="convert_compress">
+            <span class="mode-title">Convert &amp; Compress</span>
+            <span class="mode-desc">Change format and reduce size aggressively</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Step 3: Preset -->
+      <section class="panel">
+        <p class="step-label">Step 3 — Preset</p>
+        <div class="preset-group" id="presetGroup">
+          <button class="preset-btn" data-preset="lossless">
+            <span class="preset-title">Lossless</span>
+            <span class="preset-desc">No quality loss, larger files</span>
+          </button>
+          <button class="preset-btn active" data-preset="balanced">
+            <span class="preset-title">Balanced</span>
+            <span class="preset-desc">Quality 82, max 2000px wide</span>
+          </button>
+          <button class="preset-btn" data-preset="small_file">
+            <span class="preset-title">Small File</span>
+            <span class="preset-desc">Quality 68, max 1600px wide</span>
+          </button>
+        </div>
+
+        <details class="advanced-drawer" id="advancedDrawer">
+          <summary>Advanced options</summary>
+          <div class="advanced-grid">
+            <div class="adv-field" id="outputFormatField">
+              <label for="outputFormat">Output format</label>
+              <select id="outputFormat">
+                <option value="webp">WebP</option>
+                <option value="jpg">JPG</option>
+                <option value="png">PNG</option>
+              </select>
+            </div>
+            <div class="adv-field">
+              <label for="qualityInput">Quality (1–100)</label>
+              <div class="slider-row">
+                <input id="qualityRange" type="range" min="1" max="100" value="82" />
+                <input id="qualityInput" type="number" min="1" max="100" value="82" />
+              </div>
+            </div>
+            <div class="adv-field">
+              <label for="maxWidth">Max width (px)</label>
+              <input id="maxWidth" type="number" placeholder="e.g. 1920" min="1" />
+            </div>
+            <div class="adv-field">
+              <label for="maxHeight">Max height (px)</label>
+              <input id="maxHeight" type="number" placeholder="e.g. 1080" min="1" />
+            </div>
+            <div class="adv-field">
+              <label for="targetKb">Target size (KB)</label>
+              <input id="targetKb" type="number" placeholder="e.g. 200" min="1" />
+            </div>
+            <div class="adv-field adv-toggle">
+              <label>
+                <input id="stripMeta" type="checkbox" />
+                Strip metadata (EXIF, etc.)
+              </label>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- Step 4: Scan & Convert -->
+      <section class="panel scan-row">
+        <p class="step-label">Step 4 — Scan &amp; Convert</p>
+        <div class="action-row">
+          <button id="scanBtn">Scan Folder</button>
+          <button id="convertBtn" class="accent" disabled>Convert</button>
+          <button id="openOutputBtn" class="open-btn hidden">Open Output Folder</button>
+        </div>
+      </section>
+
+      <!-- Stats -->
+      <section class="stats-grid hidden" id="statsGrid"></section>
+
+      <!-- Results -->
+      <section class="panel results hidden" id="resultsPanel">
+        <div class="results-header">
+          <div>
+            <h2 id="resultsTitle">Discovered Images</h2>
+            <p id="summaryText"></p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>File</th>
+                <th>From</th>
+                <th>To</th>
+                <th id="colSizeIn" class="hidden">Original</th>
+                <th id="colSizeOut" class="hidden">Output</th>
+                <th id="colReduction" class="hidden">Saved</th>
+                <th id="colStatus" class="hidden">Status</th>
+              </tr>
+            </thead>
+            <tbody id="resultsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Log -->
+      <section class="panel hidden" id="logPanel">
+        <h2>Log</h2>
+        <ul id="logList" class="log-list"></ul>
+      </section>
+    </main>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
