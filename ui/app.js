@@ -1,6 +1,12 @@
 const { invoke } = window.__TAURI__.core;
 const { open: openDialog } = window.__TAURI__.dialog;
 
+// Guard: if Tauri APIs aren't available, surface a clear error
+if (!window.__TAURI__) {
+  document.body.innerHTML = '<p style="padding:2rem;color:red">Tauri API not found. Make sure withGlobalTauri is enabled.</p>';
+  throw new Error('Tauri not available');
+}
+
 // --- DOM refs ---
 const sourceInput       = document.getElementById('sourcePath');
 const outputBaseInput   = document.getElementById('outputBasePath');
