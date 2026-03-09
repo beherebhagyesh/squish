@@ -10,6 +10,7 @@ use std::path::{Path, PathBuf};
 // ---------------------------------------------------------------------------
 
 #[derive(Debug, Deserialize, Clone)]
+#[allow(dead_code)]
 pub struct ConvertOptions {
     pub mode: String,
     pub preset: String,
